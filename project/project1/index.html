@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Alan Liu" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
+    <title>Project 1</title>
+    <meta name="generator" content="Hugo 0.83.1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="/post/">BLOG</a></li>
+        
+        <li><a href="/projects/">PROJECTS</a></li>
+        
+        <li><a href="/resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="/project/project1/">Project 1</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         January 1, 0001 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+<script src="/rmarkdown-libs/kePrint/kePrint.js"></script>
+<link href="/rmarkdown-libs/lightable/lightable.css" rel="stylesheet" />
+
+
+<div id="this-project-requires-data-from-two-separate-data-sets.-information-about-these-the-first-dataset-for-wages-experience-and-schooling-can-be-found-here-httpsvincentarelbundock.github.iordatasetsdocecdatwages1.html" class="section level4">
+<h4>This project requires data from two separate data sets. Information about these the first dataset for Wages, Experience, and Schooling can be found here: <a href="https://vincentarelbundock.github.io/Rdatasets/doc/Ecdat/Wages1.html" class="uri">https://vincentarelbundock.github.io/Rdatasets/doc/Ecdat/Wages1.html</a></h4>
+</div>
+<div id="information-about-the-second-dataset-for-salies-for-professors-can-be-found-here-httpsvincentarelbundock.github.iordatasetsdoccardatasalaries.html" class="section level4">
+<h4>Information about the second dataset for Salies for Professors can be found here: <a href="https://vincentarelbundock.github.io/Rdatasets/doc/carData/Salaries.html" class="uri">https://vincentarelbundock.github.io/Rdatasets/doc/carData/Salaries.html</a></h4>
+</div>
+<div id="to-download-the-csv-files-directly-please-click-these-links" class="section level4">
+<h4>To download the csv files directly, please click these links:</h4>
+<div id="httpsvincentarelbundock.github.iordatasetscsvecdatwages1.csv" class="section level5">
+<h5><a href="https://vincentarelbundock.github.io/Rdatasets/csv/Ecdat/Wages1.csv" class="uri">https://vincentarelbundock.github.io/Rdatasets/csv/Ecdat/Wages1.csv</a></h5>
+</div>
+<div id="httpsvincentarelbundock.github.iordatasetscsvcardatasalaries.csv" class="section level5">
+<h5><a href="https://vincentarelbundock.github.io/Rdatasets/csv/carData/Salaries.csv" class="uri">https://vincentarelbundock.github.io/Rdatasets/csv/carData/Salaries.csv</a></h5>
+</div>
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The two data sets being analyzed in this project (links to the data sets official pages can be found above) are the Wages, Experience and Schooling data set and the Salaries for Professors data set. The Wages, Experience and Schooling data set was chosen because of interest in how experience, schooling, sex all contribute to the wage of an individual. The point of this data set is to analyze the diversity or discrimination that occurs in the workforce because of the variables included in the data set (experience, sex, schooling, and wage). The second data set was chosen because of the interest in how wages/salaries in the profession of professors is affected based on sex, discipline, and service. Both of these data sets are expected to have potential gender association, as there has been a proven disproportionate gender pay gap, so men are expected to make more than women and women less than men. Additionally, there is an expected association between the wage/salary of an individual and how long they have had schooling or have been experienced in a certain field. While other potential association may exist/may be found at the conclusion of the project, there are not apparent at the surface level of the data sets.</p>
+<pre class="r"><code># if &#39;dplyr&#39; is not installed, run the following code in the
+# console: install.packages(&#39;dplyr&#39;)
+library(Ecdat)
+library(carData)
+library(dplyr)
+library(tidyverse)
+wages &lt;- data.frame(Wages1)
+profwages &lt;- data.frame(Salaries)
+glimpse(wages)</code></pre>
+<pre><code>## Rows: 3,294
+## Columns: 4
+## $ exper  &lt;int&gt; 9, 12, 11, 9, 8, 9, 8, 10, 12, 7, 10, 10, 10, 9, 10, 3, 9, 1...
+## $ sex    &lt;fct&gt; female, female, female, female, female, female, female, fema...
+## $ school &lt;int&gt; 13, 12, 11, 14, 14, 14, 12, 12, 10, 12, 14, 13, 13, 10, 13, ...
+## $ wage   &lt;dbl&gt; 6.3152956, 5.4797700, 3.6421699, 4.5933366, 2.4181575, 2.094...</code></pre>
+<pre class="r"><code>glimpse(profwages)</code></pre>
+<pre><code>## Rows: 397
+## Columns: 6
+## $ rank          &lt;fct&gt; Prof, Prof, AsstProf, Prof, Prof, AssocProf, Prof, Pr...
+## $ discipline    &lt;fct&gt; B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, A,...
+## $ yrs.since.phd &lt;int&gt; 19, 20, 4, 45, 40, 6, 30, 45, 21, 18, 12, 7, 1, 2, 20...
+## $ yrs.service   &lt;int&gt; 18, 16, 3, 39, 41, 6, 23, 45, 20, 18, 8, 2, 1, 0, 18,...
+## $ sex           &lt;fct&gt; Male, Male, Male, Male, Male, Male, Male, Male, Male,...
+## $ salary        &lt;int&gt; 139750, 173200, 79750, 115000, 141500, 97000, 175000,...</code></pre>
+</div>
+<div id="initial-wrangling-tidying" class="section level2">
+<h2>Initial Wrangling &amp; Tidying</h2>
+<pre class="r"><code># Adjusting the 1980&#39;s wages variable to be a 2009 yearly
+# salary variable
+wages &lt;- wages %&gt;% mutate(salary = (round((wage * 40) * 39.1072) * 
+    2.74))
+head(wages)</code></pre>
+<pre><code>##   exper    sex school     wage   salary
+## 1     9 female     13 6.315296 27068.46
+## 2    12 female     12 5.479770 23487.28
+## 3    11 female     11 3.642170 15609.78
+## 4     9 female     14 4.593337 19686.90
+## 5     8 female     14 2.418157 10365.42
+## 6     9 female     14 2.094058  8976.24</code></pre>
+<pre class="r"><code># Renaming &#39;professors service&#39; to &#39;years of experience&#39;
+profwages &lt;- profwages %&gt;% rename(exper = yrs.service)
+
+# Cleaning the data so that &#39;Males&#39; become &#39;males&#39; and
+# &#39;Females&#39; become &#39;females&#39;
+profwages &lt;- profwages %&gt;% mutate(sex = if (sex == &quot;Male&quot;) {
+    sex = &quot;male&quot;
+} else {
+    sex = &quot;female&quot;
+})</code></pre>
+<p>All data in both data sets was already mostly tidy. The only tidying needed to be done was toLower() the name of the sexes. Because one data set had sexes starting with a capital and one data set had the sexes starting with a lower case, the capital-starting sexes variable was changed to become lower case. Renaming the variable “yrs.service” in the Salaries data set to “exper” was also done because the experience variable in the Wages1 data set represents the same idea. These two variables were combined and are going to be used in the full_join() function.Additional tidying will be done in the summarizing section. Because salaries were represented differently in the two data sets, an initial wrangling call (mutate()) had to be done in order to join the two data sets together by a specific variable. The “Wages1” data set represented salaries paid by the hour, so this data set was mutated so that the represented variable “salary” would align closer to the other data set, “Salaries”, and the variable located in that data set called “salary”. In addition to the mutation of this column, it was also adjusted for inflation. The prices represented in the “wages1” data set were 1980’s prices whereas the “Salaries” data set was represented by 2009 prices. This has been adjusted accordingly so that the data being analyzed will be more accurately documented and recorded.</p>
+</div>
+<div id="joiningmerging" class="section level2">
+<h2>Joining/Merging</h2>
+<pre class="r"><code>allwages &lt;- full_join(wages, profwages, by = c(&quot;salary&quot;, &quot;sex&quot;, 
+    &quot;exper&quot;))
+summary(allwages)</code></pre>
+<pre><code>##      exper            sex                school           wage        
+##  Min.   : 0.000   Length:3691        Min.   : 3.00   Min.   : 0.0766  
+##  1st Qu.: 7.000   Class :character   1st Qu.:11.00   1st Qu.: 3.6216  
+##  Median : 8.000   Mode  :character   Median :12.00   Median : 5.2058  
+##  Mean   : 9.073                      Mean   :11.63   Mean   : 5.7576  
+##  3rd Qu.:10.000                      3rd Qu.:12.00   3rd Qu.: 7.3045  
+##  Max.   :60.000                      Max.   :16.00   Max.   :39.8089  
+##                                      NA&#39;s   :397     NA&#39;s   :397      
+##      salary                rank      discipline  yrs.since.phd  
+##  Min.   :   328.8   AsstProf :  67   A   : 181   Min.   : 1.00  
+##  1st Qu.: 16379.7   AssocProf:  64   B   : 216   1st Qu.:12.00  
+##  Median : 24062.7   Prof     : 266   NA&#39;s:3294   Median :21.00  
+##  Mean   : 34253.7   NA&#39;s     :3294               Mean   :22.32  
+##  3rd Qu.: 35898.1                                3rd Qu.:32.00  
+##  Max.   :231545.0                                Max.   :56.00  
+##                                                  NA&#39;s   :3294</code></pre>
+<p>A full-join by salary, sex, and experience was used to join the two data sets. This is because the variables that were common in both of the data sets were sex, salary, and experience, three variables that can be merged into the single large data set. The other variables, (school, wage, rank, discipline, yrs.since.phd, yrs.service), are all necessary for later the final data set. Because there are some data observations with NAs from one data set and other NAs from the other data set, none of the cases in this data set were dropped. All of them were preserved for the total, final data set.</p>
+</div>
+<div id="wrangling" class="section level2">
+<h2>Wrangling</h2>
+<pre class="r"><code># if kable graphs are not installed, run this in the console:
+# install.packages(&#39;kableExtra&#39;)
+library(kableExtra)
+# creating a range bracket variable as part of the wrangling
+salary_range &lt;- allwages %&gt;% group_by(salary_range = cut(salary, 
+    breaks = seq(0, 250000, by = 10000))) %&gt;% summarize(count = n())
+glimpse(salary_range)</code></pre>
+<pre><code>## Rows: 22
+## Columns: 2
+## $ salary_range &lt;fct&gt; &quot;(0,1e+04]&quot;, &quot;(1e+04,2e+04]&quot;, &quot;(2e+04,3e+04]&quot;, &quot;(3e+04...
+## $ count        &lt;int&gt; 301, 1083, 973, 563, 227, 81, 40, 57, 49, 54, 76, 41, ...</code></pre>
+<pre class="r"><code># create a categorical subset that only includes males
+male_data &lt;- allwages %&gt;% select(salary, sex) %&gt;% filter(sex == 
+    &quot;male&quot;) %&gt;% arrange(desc(salary))
+
+# create a categorical subset that only includes females
+female_data &lt;- allwages %&gt;% select(salary, sex) %&gt;% filter(sex == 
+    &quot;female&quot;) %&gt;% arrange(desc(salary))
+
+# summarizing overall data
+all_sum &lt;- data.frame(Statistics = c(&quot;Mean&quot;, &quot;Standard Deviation&quot;, 
+    &quot;Variance&quot;, &quot;Minimum&quot;, &quot;Maximum&quot;), Values = c(mean(allwages$salary), 
+    sd(allwages$salary), var(allwages$salary), min(allwages$salary), 
+    max(allwages$salary)))
+options(scipen = 999)
+kbl(all_sum) %&gt;% kable_paper(full_width = F) %&gt;% column_spec(1, 
+    bold = T, border_right = T) %&gt;% column_spec(2, width = &quot;10em&quot;, 
+    background = &quot;lightgrey&quot;)</code></pre>
+<table class=" lightable-paper" style="font-family: &quot;Arial Narrow&quot;, arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Statistics
+</th>
+<th style="text-align:right;">
+Values
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;font-weight: bold;border-right:1px solid;">
+Mean
+</td>
+<td style="text-align:right;width: 10em; background-color: lightgrey !important;">
+34253.67
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;border-right:1px solid;">
+Standard Deviation
+</td>
+<td style="text-align:right;width: 10em; background-color: lightgrey !important;">
+32166.86
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;border-right:1px solid;">
+Variance
+</td>
+<td style="text-align:right;width: 10em; background-color: lightgrey !important;">
+1034706911.35
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;border-right:1px solid;">
+Minimum
+</td>
+<td style="text-align:right;width: 10em; background-color: lightgrey !important;">
+328.80
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;border-right:1px solid;">
+Maximum
+</td>
+<td style="text-align:right;width: 10em; background-color: lightgrey !important;">
+231545.00
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>allwages %&gt;% summarize(mean(salary), sd(salary), var(salary), 
+    var(salary), min(salary), max(salary)) %&gt;% kbl() %&gt;% kable_paper(full_width = F) %&gt;% 
+    column_spec(1, width = &quot;10em&quot;, border_right = T, background = &quot;yellow&quot;) %&gt;% 
+    column_spec(2, width = &quot;10em&quot;, border_right = T, background = &quot;yellow&quot;) %&gt;% 
+    column_spec(3, width = &quot;10em&quot;, border_right = T, background = &quot;yellow&quot;) %&gt;% 
+    column_spec(4, width = &quot;10em&quot;, border_right = T, background = &quot;yellow&quot;) %&gt;% 
+    column_spec(5, width = &quot;10em&quot;, background = &quot;yellow&quot;)</code></pre>
+<table class=" lightable-paper" style="font-family: &quot;Arial Narrow&quot;, arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+mean(salary)
+</th>
+<th style="text-align:right;">
+sd(salary)
+</th>
+<th style="text-align:right;">
+var(salary)
+</th>
+<th style="text-align:right;">
+min(salary)
+</th>
+<th style="text-align:right;">
+max(salary)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;width: 10em; background-color: yellow !important;border-right:1px solid;">
+34253.67
+</td>
+<td style="text-align:right;width: 10em; background-color: yellow !important;border-right:1px solid;">
+32166.86
+</td>
+<td style="text-align:right;width: 10em; background-color: yellow !important;border-right:1px solid;">
+1034706911
+</td>
+<td style="text-align:right;width: 10em; background-color: yellow !important;border-right:1px solid;">
+328.8
+</td>
+<td style="text-align:right;width: 10em; background-color: yellow !important;">
+231545
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># summarizing after male categorical grouping
+male_data %&gt;% summarize(mean(salary), sd(salary), var(salary), 
+    min(salary), max(salary)) %&gt;% pivot_longer(cols = everything(), 
+    names_to = &quot;Statistic&quot;, values_to = &quot;Values&quot;) %&gt;% kbl() %&gt;% 
+    kable_paper(full_width = F) %&gt;% column_spec(1, bold = T, 
+    border_right = T) %&gt;% column_spec(2, width = &quot;10em&quot;, background = &quot;lightblue&quot;)</code></pre>
+<table class=" lightable-paper" style="font-family: &quot;Arial Narrow&quot;, arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Statistic
+</th>
+<th style="text-align:right;">
+Values
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;font-weight: bold;border-right:1px solid;">
+mean(salary)
+</td>
+<td style="text-align:right;width: 10em; background-color: lightblue !important;">
+43269.30
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;border-right:1px solid;">
+sd(salary)
+</td>
+<td style="text-align:right;width: 10em; background-color: lightblue !important;">
+38684.24
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;border-right:1px solid;">
+var(salary)
+</td>
+<td style="text-align:right;width: 10em; background-color: lightblue !important;">
+1496470512.27
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;border-right:1px solid;">
+min(salary)
+</td>
+<td style="text-align:right;width: 10em; background-color: lightblue !important;">
+657.60
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;border-right:1px solid;">
+max(salary)
+</td>
+<td style="text-align:right;width: 10em; background-color: lightblue !important;">
+231545.00
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># summarizing after female categorical grouping
+female_data %&gt;% summarize(mean(salary), sd(salary), var(salary), 
+    min(salary), max(salary)) %&gt;% pivot_longer(cols = everything(), 
+    names_to = &quot;Statistic&quot;, values_to = &quot;Values&quot;) %&gt;% kbl() %&gt;% 
+    kable_paper(full_width = F) %&gt;% column_spec(1, bold = T, 
+    border_right = T) %&gt;% column_spec(2, width = &quot;10em&quot;, background = &quot;pink&quot;)</code></pre>
+<table class=" lightable-paper" style="font-family: &quot;Arial Narrow&quot;, arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Statistic
+</th>
+<th style="text-align:right;">
+Values
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;font-weight: bold;border-right:1px solid;">
+mean(salary)
+</td>
+<td style="text-align:right;width: 10em; background-color: pink !important;">
+22060.44
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;border-right:1px solid;">
+sd(salary)
+</td>
+<td style="text-align:right;width: 10em; background-color: pink !important;">
+12328.01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;border-right:1px solid;">
+var(salary)
+</td>
+<td style="text-align:right;width: 10em; background-color: pink !important;">
+151979827.53
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;border-right:1px solid;">
+min(salary)
+</td>
+<td style="text-align:right;width: 10em; background-color: pink !important;">
+328.80
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;border-right:1px solid;">
+max(salary)
+</td>
+<td style="text-align:right;width: 10em; background-color: pink !important;">
+139287.90
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># If looking for categorical mutations earlier in this block
+# of code. If looking for mutation and/or use of if
+# statements, check section &#39;Initial Wrangling &amp; Tidying&#39;.</code></pre>
+<p>Initially, the procedure to get to the summary statistics is to create multiple subsets using group_by and filtering to make later groupings easier. Next, conducting the summary statistics by using summary() and the applicable function calls (mean(), sd(), etc.) shows a crude representation of what occurs after the function calls. Afterwards, pivot_longer and kbl() function calls are done to make the data much more easily readable and understandable. From the summary statistics, what is easily observable is the significant difference in the categorical division of the large data set. The difference in salaries between males and females is extremely obvious, as the mean difference between the two genders is nearly DOUBLE as much for males than it is for females. Additionally, the maximum salary observed in this data set for males is paid nearly $100,000 more than the highest paid female from this data set. While this data analysis is shocking, it is unsurprising. The gender inequality difference is disgustingly apparent, even more so because of this data set and the time frame this data was collected (1980 for the first data set, 2009 for the second data set, as gender inequalities were not looked down upon as harshly).</p>
+</div>
+<div id="visualizing" class="section level2">
+<h2>Visualizing</h2>
+<pre class="r"><code># creation of the correlation heatmap
+library(&quot;ggplot2&quot;)
+allwages %&gt;% select_if(is.numeric) %&gt;% cor(use = &quot;pairwise.complete.obs&quot;) %&gt;% 
+    as.data.frame %&gt;% rownames_to_column(&quot;var1&quot;) %&gt;% pivot_longer(-1, 
+    names_to = &quot;var2&quot;, values_to = &quot;correlation&quot;) %&gt;% ggplot2::ggplot(aes(var1, 
+    var2, fill = correlation)) + geom_tile() + geom_text(aes(label = round(correlation, 
+    2)))</code></pre>
+<p><img src="/project/Project1_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The correlation matrix is complete with some “omitted”/“NA” cells because of the difference between the two data sets variables. While one data set has a variable that discusses “years since phd”, the other data set does not have this variable, but instead uses variables like “wage” and “experience”. This lone variable is important. It shows the correlation between years since an individual’s Ph.D and their experience or their salary. While this is not applicable to some individuals who has not received a Ph.D (aka, the individuals who are in the Wages1 data set), it is still important to see/analyze/understand that there is a relationship/correlation between these three variables in this data set and the final data set. Therefore, this variable was not removed from this visualization of total correlations. However, it will be removed later in a later section in order to run certain functions.</p>
+<pre class="r"><code># Visualizing data from Salaries data set
+phd_discipl_rank &lt;- Salaries %&gt;% ggplot2::ggplot() + geom_point(aes(x = yrs.since.phd, 
+    y = salary, color = rank)) + labs(x = &quot;Years since Ph.D.&quot;, 
+    y = &quot;Nine-Month Salary (in Dollars)&quot;, title = &quot;Nine-Month Salary vs. Years since Ph.D.&quot;) + 
+    scale_x_continuous(breaks = (seq(0, max(Salaries$yrs.since.phd), 
+        by = 5))) + scale_y_continuous(breaks = (seq(50000, max(Salaries$salary), 
+    by = 10000))) + theme(panel.grid.major = element_line(colour = &quot;yellow&quot;)) + 
+    theme(panel.background = element_rect(&quot;lightgrey&quot;))
+
+phd_discipl_rank</code></pre>
+<p><img src="/project/Project1_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Visualizing data from Wages1 data set
+sex_school_wage &lt;- Wages1 %&gt;% ggplot2::ggplot() + geom_point(aes(x = school, 
+    y = wage, color = sex), stat = &quot;summary&quot;) + labs(x = &quot;Total Years of Schooling&quot;, 
+    y = &quot;Hourly Wage (in Dollars)&quot;, title = &quot;Hourly Wage vs. Years of Schooling&quot;) + 
+    scale_x_continuous(breaks = (seq(0, max(Wages1$school)))) + 
+    theme(panel.grid.major = element_line(colour = &quot;grey&quot;))
+
+sex_school_wage</code></pre>
+<p><img src="/project/Project1_files/figure-html/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>From the Nine-Month Salary vs. Years since Ph.D, it is quite apparent that under the rank of Professor, those individuals will make much more than the Assistant Professors or the Associate Professors. Additionally, because ranked Professors have spent much more time in a college scene, their years since they got their Ph.D is much more than an individual ranked as a Assistant Professor or a Associate Professor. Overall, the trend is that the more years it has been since an individual has received their Ph.D, it is more likely that they are going to be a full-time Professor. As an individual’s salary increases, it is more likely that they are a full-time Professor.</p>
+<p>From the Hourly Wage vs. Years of Schooling graph, the summary statistics show that as an individual increases their total years of schooling, the direct correlation is that their hourly wage in dollars will increase over time. However, at the very end of the graph, it appears that after a total year of schooling great than 16, individuals will begin to decrease their hourly wage and not make as much as an individual who has only 15 years of schooling. It is also quite apparent that females will always make significantly less than their male counter-parts, despite their total years of schooling being identical. This continues to prove the fact that a gender-pay discrepancy exists in the United States.</p>
+</div>
+<div id="dimensionality-reduction" class="section level2">
+<h2>Dimensionality Reduction</h2>
+<pre class="r"><code># cleaning the data set one more time for final
+# dimensionality reduction
+cleanwages &lt;- allwages[, colSums(is.na(allwages)) == 0]
+
+# Changing the variable &#39;sex&#39; to represent males as 1 and
+# females as 0
+cleanwages &lt;- cleanwages %&gt;% mutate(sex = if (sex == &quot;Male&quot;) {
+    sex = 1
+} else {
+    sex = 0
+})
+
+wss &lt;- vector()
+
+# algorithm to find ideal number of clusters
+for (i in 1:10) {
+    temp &lt;- cleanwages %&gt;% select(everything()) %&gt;% kmeans(i)
+    wss[i] &lt;- temp$tot.withinss
+}
+
+ggplot() + geom_point(aes(x = 1:10, y = wss)) + geom_path(aes(x = 1:10, 
+    y = wss)) + xlab(&quot;clusters&quot;) + scale_x_continuous(breaks = 1:10)</code></pre>
+<p><img src="/project/Project1_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>According to the graph, the optimal amount of clusters should be 4.</p>
+<pre class="r"><code># creating the final visualizations for the clusters
+kmeans1 &lt;- cleanwages %&gt;% kmeans(4)
+cluster &lt;- kmeans1$cluster
+kmeans1</code></pre>
+<pre><code>## K-means clustering with 4 clusters of sizes 1103, 2144, 151, 293
+## 
+## Cluster means:
+##       exper sex    salary
+## 1  8.222121   0  37015.59
+## 2  7.975746   0  16999.13
+## 3 22.059603   0 146261.84
+## 4 13.610922   0  92390.55
+## 
+## Clustering vector:
+##   [1] 1 2 2 2 2 2 2 2 2 2 1 1 1 2 2 1 2 2 2 1 2 2 2 2 2 1 2 2 2 2 2 1 2 2 1 2 2
+##  [38] 1 1 1 2 1 1 2 2 2 2 2 2 2 2 1 2 1 2 2 2 2 1 2 2 2 1 1 2 2 2 2 2 2 2 2 2 2
+##  [75] 1 2 2 1 2 1 2 1 1 2 2 2 2 1 2 2 2 2 1 2 2 2 1 2 2 2
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 3591 entries ]
+## 
+## Within cluster sum of squares by cluster:
+## [1] 76026403143 81373975727 63861489858 65352748676
+##  (between_SS / total_SS =  92.5 %)
+## 
+## Available components:
+## 
+## [1] &quot;cluster&quot;      &quot;centers&quot;      &quot;totss&quot;        &quot;withinss&quot;     &quot;tot.withinss&quot;
+## [6] &quot;betweenss&quot;    &quot;size&quot;         &quot;iter&quot;         &quot;ifault&quot;</code></pre>
+<pre class="r"><code># Final tidying of the data
+ggplot(cleanwages, aes(x = exper, y = salary, color = cluster)) + 
+    geom_point() + guides(color = guide_legend(override.aes = list(size = 10))) + 
+    theme(legend.key = element_rect())</code></pre>
+<p><img src="/project/Project1_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># install.packages(&#39;factoextra&#39;) &amp;
+# install.packages(&#39;cluster&#39;) need to be run in console
+# before running this code
+library(factoextra)
+library(cluster)
+
+sil &lt;- silhouette(cluster, dist(cleanwages))
+fviz_silhouette(sil)</code></pre>
+<pre><code>##   cluster size ave.sil.width
+## 1       1 1103          0.51
+## 2       2 2144          0.62
+## 3       3  151          0.55
+## 4       4  293          0.55</code></pre>
+<p><img src="/project/Project1_files/figure-html/unnamed-chunk-7-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>In using an algorithm to determine the correct number of clusters to represent my data should be around 4 clusters. After finding the optimal amount of clusters, generating a visualization of the clusters was done after the entire data set was cleaned, removing all column variables that contained NA’s. After the visualization was generated, clusters were color coordinated to have a better understanding of what the cluster points better represented. According to the visualization of the clusters, if an individual has less than 20 years of experience in whatever their field of interest is, the range of salaries has extreme variance. The lowest an individual makes is nearly $0 a year while the highest is over $200,000 a year. Anything after 20 years of experience, the clusters seem to steady out, as the lowest salary that an individual will make is near $60,000 while the highest an individual will make is over $250,000. This means that while most people will end up having little experience initially and not be paid very much, over time, as an individual gathers more experience in their field, they will very likely end up with a much higher salary than when they started.</p>
+<p>Additionally, from a silhouette analysis, the average silhouette width is 0.58. This indicates that a reasonable structure has been created with the clusters and that this data can be used to make reasonable assumptions from.</p>
+</div>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/js/docs.min.js"></script>
+<script src="/js/main.js"></script>
+
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

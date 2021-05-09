@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Alan Liu" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
+    <title>Project2</title>
+    <meta name="generator" content="Hugo 0.83.1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="/post/">BLOG</a></li>
+        
+        <li><a href="/projects/">PROJECTS</a></li>
+        
+        <li><a href="/resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="/project/project2/">Project2</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         January 1, 0001 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<div id="project-2-modeling-testing-and-predicting" class="section level2">
+<h2>Project 2: Modeling, Testing, and Predicting</h2>
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The data set being analyzed in this project is the KosteckiDillon data set from the carData package. The data set consists of logs from 133 patients from a treatment program that aimed to reduce migraine frequency and severity. This data set contains the variables time, dos, hatype, age, airq, medication, headache, and sex. Time represents the time in days relative to the onset of treatment, which occurred at time zero. Dos represents the time in days from the start of the study (January 1). Hatype represents the type of migraine experienced by the subject. Age represents the age of the subject at the onset of the treatment in years. Airq represents the air quality the subject experiences. Medication represents subjects who discontinued their medication, continued with a reduced dose, or continued at the previous dose. Headache represents the subject’s answer if they experienced a headache or not (yes or no). Sex represents the sex of the subject (male or female). This data set has a total of 4152 observations.</p>
+<pre class="r"><code>library(carData)
+migraine &lt;- data.frame(KosteckiDillon)
+head(migraine)</code></pre>
+<pre><code>##   id time dos hatype age airq medication headache    sex
+## 1  1  -11 753   Aura  30    9 continuing      yes female
+## 2  1  -10 754   Aura  30    7 continuing      yes female
+## 3  1   -9 755   Aura  30   10 continuing      yes female
+## 4  1   -8 756   Aura  30   13 continuing      yes female
+## 5  1   -7 757   Aura  30   18 continuing      yes female
+## 6  1   -6 758   Aura  30   19 continuing      yes female</code></pre>
+</div>
+<div id="manova-test" class="section level2">
+<h2>MANOVA Test</h2>
+<pre class="r"><code>man1 &lt;- manova(cbind(time, dos, age, airq, headache, sex) ~ medication, 
+    data = migraine)
+summary(man1)</code></pre>
+<pre><code>##              Df  Pillai approx F num Df den Df    Pr(&gt;F)    
+## medication    2 0.16448   61.907     12   8290 &lt; 2.2e-16 ***
+## Residuals  4149                                             
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>Because the MANOVA summary indicates that the MANOVA test is significant, one-way ANOVA tests are needed to be done for each individual variable.</p>
+<pre class="r"><code>summary.aov(man1)</code></pre>
+<pre><code>##  Response time :
+##               Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
+## medication     2  125214   62607  141.47 &lt; 2.2e-16 ***
+## Residuals   4149 1836160     443                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response dos :
+##               Df    Sum Sq Mean Sq F value    Pr(&gt;F)    
+## medication     2   9178895 4589447  41.502 &lt; 2.2e-16 ***
+## Residuals   4149 458811385  110584                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response age :
+##               Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+## medication     2   2893 1446.69  11.589 9.569e-06 ***
+## Residuals   4149 517924  124.83                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response airq :
+##               Df Sum Sq Mean Sq F value   Pr(&gt;F)   
+## medication     2    956  477.93  5.2907 0.005073 **
+## Residuals   4149 374799   90.33                    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response headache :
+##               Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+## medication     2  49.83  24.915  114.31 &lt; 2.2e-16 ***
+## Residuals   4149 904.33   0.218                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response sex :
+##               Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+## medication     2  15.39  7.6968  63.504 &lt; 2.2e-16 ***
+## Residuals   4149 502.87  0.1212                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>After looking at each individual variable, it can be concluded that all of these variables are significant. However, because headache and sex are categorical variables, they will be excluded in the t-test analysis. With the significant variables selected, a POST HOC T-test is to be conducted on these variables.</p>
+<pre class="r"><code>library(dplyr)
+library(rstatix)
+group &lt;- migraine$medication
+DVs &lt;- migraine %&gt;% select(time, age, dos, airq)
+# test for normality
+sapply(split(DVs, group), mshapiro_test)</code></pre>
+<pre><code>##           none         reduced      continuing  
+## statistic 0.9368121    0.9666419    0.9558225   
+## p.value   9.918432e-18 3.317105e-14 2.678441e-26</code></pre>
+<pre class="r"><code># test for homogeneity
+lapply(split(DVs, group), cov)</code></pre>
+<pre><code>## $none
+##            time          age        dos         airq
+## time  539.48977    49.317017   1896.823   -24.765103
+## age    49.31702   132.948151  -1063.980     8.765062
+## dos  1896.82331 -1063.979860 106959.501 -1436.393986
+## airq  -24.76510     8.765062  -1436.394   107.970216
+## 
+## $reduced
+##             time        age        dos        airq
+## time   704.46249 -45.988137 -1751.9496  -15.037916
+## age    -45.98814 143.203890   730.9086   -1.574537
+## dos  -1751.94963 730.908647 82294.5606 -269.057057
+## airq   -15.03792  -1.574537  -269.0571   95.018054
+## 
+## $continuing
+##            time        age         dos        airq
+## time  303.07201 -28.588316   -669.8545   10.117421
+## age   -28.58832 114.613235    248.9559   -4.271378
+## dos  -669.85454 248.955914 123398.9378 -138.105754
+## airq   10.11742  -4.271378   -138.1058   82.613077</code></pre>
+<pre class="r"><code>migraine %&gt;% group_by(medication) %&gt;% summarize(mean(time), mean(age), 
+    mean(dos), mean(airq))</code></pre>
+<pre><code>## # A tibble: 3 x 5
+##   medication `mean(time)` `mean(age)` `mean(dos)` `mean(airq)`
+##   &lt;fct&gt;             &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;
+## 1 none               18.9        42.4        689.         25.7
+## 2 reduced            23.7        43.8        564.         25.0
+## 3 continuing         10.9        41.8        667.         24.5</code></pre>
+<pre class="r"><code>pairwise.t.test(migraine$time, migraine$medication, p.adj = &quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  migraine$time and migraine$medication 
+## 
+##            none    reduced
+## reduced    1.6e-06 -      
+## continuing &lt; 2e-16 &lt; 2e-16
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(migraine$age, migraine$medication, p.adj = &quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  migraine$age and migraine$medication 
+## 
+##            none   reduced
+## reduced    0.0078 -      
+## continuing 0.1797 1.5e-06
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(migraine$dos, migraine$medication, p.adj = &quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  migraine$dos and migraine$medication 
+## 
+##            none    reduced
+## reduced    3.5e-15 -      
+## continuing 0.1     3.5e-16
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(migraine$airq, migraine$medication, p.adj = &quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  migraine$airq and migraine$medication 
+## 
+##            none   reduced
+## reduced    0.1329 -      
+## continuing 0.0015 0.1227 
+## 
+## P value adjustment method: none</code></pre>
+<p>The one-way MANOVA was conducted to determine the effect of the medication from four dependent variables (time, age, dos and airq). After checking the data, each group revealed no significant differences from multivariate normality. The covariance matrix for each group revealed there was a lack of relative homogeneity. No univariate or multivariate outliers were evident and MANOVA was considered to be an appropriate analysis technique.</p>
+<p>Significant differences were found among the three different results of medication after the treatment program was over.</p>
+<p>Univariate ANOVAs for each numerical variable was conducted as a follow up tests to the MANOVA. The univariate ANOVAs for the dependent variables were also significant. Because the post hoc was tested with adjustments, a type 1 error is not needed to be calculated.</p>
+<p>The total number of tests performed was 17 (1 MANVOA, 4 ANOVAs, 12 t tests)The Post Hoc analysis was performed conducting pairwise comparisons to determine which medication differed in all the dependent variables (time, age dos, and air quality). Using the bonferroni significance correction (17 tests done, new alpha level should be = 0.294), all medications were found to differ significantly from one another even with the bonferroni alpha level.</p>
+</div>
+<div id="randomized-test" class="section level2">
+<h2>Randomized Test</h2>
+<p>In this randomized test, we are testing the difference in standard deviations between two groups in terms of air quality. The null hypothesis for this test is the average standard deviation difference of air quality between the two groups (males and females) is the same. The alternative hypothesis is that the standard deviation difference is different between males and females.</p>
+<pre class="r"><code>library(dplyr)
+migraine %&gt;% group_by(sex) %&gt;% summarize(s = sd(airq)) %&gt;% summarize(diff(s))</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   `diff(s)`
+##       &lt;dbl&gt;
+## 1     0.282</code></pre>
+<pre class="r"><code>rand_dist &lt;- vector()
+for (i in 1:300) {
+    new &lt;- data.frame(airq = sample(migraine$airq), sex = migraine$sex)
+    rand_dist[i] &lt;- sd(new[new$sex == &quot;male&quot;, ]$airq) - sd(new[new$sex == 
+        &quot;female&quot;, ]$airq)
+}
+
+mean(rand_dist &lt; -0.282 | rand_dist &gt; 0.282)</code></pre>
+<pre><code>## [1] 0.4566667</code></pre>
+<pre class="r"><code>hist(rand_dist, main = &quot;&quot;, ylab = &quot;&quot;)
+abline(v = c(0.282, -0.282), col = &quot;red&quot;)</code></pre>
+<p><img src="/project/Project2_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>From the results, we reject the null hypothesis. There is enough evidence to conclude that the average standard deviation of air quality between the two groups, males and females, is significantly different enough. The p-value generated from the random sample indicates that there exists enough of a difference to a point where the null hypothesis can no longer be correct.</p>
+</div>
+<div id="building-a-linear-regression-model" class="section level2">
+<h2>Building a Linear Regression Model</h2>
+<pre class="r"><code>migraine$dos_c &lt;- migraine$dos - mean(migraine$dos)
+migraine$time_c &lt;- migraine$time - mean(migraine$time)
+
+fit &lt;- lm(airq ~ dos_c + medication + (dos_c * medication), data = migraine)
+summary(fit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = airq ~ dos_c + medication + (dos_c * medication), 
+##     data = migraine)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -29.017  -6.440  -0.786   4.329  47.872 
+## 
+## Coefficients:
+##                             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                26.273596   0.334681  78.503  &lt; 2e-16 ***
+## dos_c                      -0.013429   0.001015 -13.226  &lt; 2e-16 ***
+## medicationreduced          -1.528914   0.455578  -3.356 0.000798 ***
+## medicationcontinuing       -1.791115   0.385182  -4.650 3.42e-06 ***
+## dos_c:medicationreduced     0.010160   0.001450   7.006 2.85e-12 ***
+## dos_c:medicationcontinuing  0.012310   0.001151  10.695  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 9.298 on 4146 degrees of freedom
+## Multiple R-squared:  0.04607,    Adjusted R-squared:  0.04492 
+## F-statistic: 40.04 on 5 and 4146 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>The model created to predict the air quality of a subject from their time in days from the start of the study and their type of medication they are on after the treatment was over. The intercept is 26.274, which means that a subject with zero start time and zero medication will have a starting air quality of 26.274. Reduced medication subjects with zero dos have a predicted air quality that is -1.529 lower than non-reduced medication subjects with zero dos. Continuing medication subjects with zero dos have a predicted dos that is -1.791 lower than non-continuing medicated subjects with zero dos. For every 1-unit increase in dos, air quality will decrease by a factor of 0.0134. The slope of dos for subjects who have reduced medication is 0.0102 greater than subjects who have continuing medication. The slope of dos for subjects who have continuing medication is 0.0123 greater than subjects who have reduced medication.</p>
+<pre class="r"><code>library(ggplot2)
+ggplot(fit, aes(airq, dos_c, color = medication)) + geom_smooth(method = &quot;lm&quot;, 
+    se = F, fullrange = T) + geom_point() + geom_vline(xintercept = 0, 
+    lty = 2) + geom_vline(xintercept = mean(migraine$airq))</code></pre>
+<p><img src="/project/Project2_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>From the R square value, the model indicates that 4.61% of variability in air quality is explained.</p>
+<pre class="r"><code>library(ggplot2)
+# assumptions check
+resids &lt;- fit$residuals
+ggplot() + geom_histogram(aes(resids), bins = 20)</code></pre>
+<p><img src="/project/Project2_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(fit, aes(sample = resids)) + stat_qq() + stat_qq_line()</code></pre>
+<p><img src="/project/Project2_files/figure-html/unnamed-chunk-8-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>fitvals &lt;- fit$fitted.values
+ggplot() + geom_point(aes(fitvals, resids)) + geom_hline(yintercept = 0, 
+    color = &quot;red&quot;)</code></pre>
+<p><img src="/project/Project2_files/figure-html/unnamed-chunk-8-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p>From the visual assumptions checks it can be safely assumed that the model fails the linearity/homoeskedasticity assumption. The residual plot indicates that the points plotted are statistically influenced by one another, as the points lie on top of one another. The model does pass the normality check, as the points plotted by the normality plot fall relatively on the line.</p>
+<pre class="r"><code># correction for robust standard errors
+library(sandwich)
+library(lmtest)
+bptest(fit)</code></pre>
+<pre><code>## 
+##  studentized Breusch-Pagan test
+## 
+## data:  fit
+## BP = 78.754, df = 5, p-value = 1.529e-15</code></pre>
+<pre class="r"><code>coeftest(fit, vcov = vcovHC(fit))[, 1:4]</code></pre>
+<pre><code>##                               Estimate  Std. Error    t value     Pr(&gt;|t|)
+## (Intercept)                26.27359611 0.361354485  72.708648 0.000000e+00
+## dos_c                      -0.01342933 0.001127751 -11.908061 3.575526e-32
+## medicationreduced          -1.52891409 0.469987166  -3.253098 1.150692e-03
+## medicationcontinuing       -1.79111460 0.406428994  -4.406956 1.074840e-05
+## dos_c:medicationreduced     0.01015989 0.001471776   6.903148 5.859671e-12
+## dos_c:medicationcontinuing  0.01231014 0.001226870  10.033785 1.999697e-23</code></pre>
+<p>From the robust standard errors, these correct the original standard errors from the original model and correct the violations of homoskedasticity discovered from the assumptions checks. These corrected standard errors are all significant (indicated by the p-values from the table), and will be bootstrapped to the model and used as the default standard errors.</p>
+</div>
+<div id="bootstrapping-standard-errors" class="section level2">
+<h2>Bootstrapping Standard Errors</h2>
+<pre class="r"><code>coeftest(fit)[, 1:4]</code></pre>
+<pre><code>##                               Estimate  Std. Error    t value     Pr(&gt;|t|)
+## (Intercept)                26.27359611 0.334680647  78.503482 0.000000e+00
+## dos_c                      -0.01342933 0.001015380 -13.225909 3.819958e-39
+## medicationreduced          -1.52891409 0.455578385  -3.355985 7.979447e-04
+## medicationcontinuing       -1.79111460 0.385181622  -4.650052 3.421808e-06
+## dos_c:medicationreduced     0.01015989 0.001450172   7.005987 2.849313e-12
+## dos_c:medicationcontinuing  0.01231014 0.001150981  10.695351 2.354068e-26</code></pre>
+<pre class="r"><code>coeftest(fit, vcov = vcovHC(fit))[, 1:4]</code></pre>
+<pre><code>##                               Estimate  Std. Error    t value     Pr(&gt;|t|)
+## (Intercept)                26.27359611 0.361354485  72.708648 0.000000e+00
+## dos_c                      -0.01342933 0.001127751 -11.908061 3.575526e-32
+## medicationreduced          -1.52891409 0.469987166  -3.253098 1.150692e-03
+## medicationcontinuing       -1.79111460 0.406428994  -4.406956 1.074840e-05
+## dos_c:medicationreduced     0.01015989 0.001471776   6.903148 5.859671e-12
+## dos_c:medicationcontinuing  0.01231014 0.001226870  10.033785 1.999697e-23</code></pre>
+<p>There are noticeable changes in the standard errors after analyzing the difference between the original standard errors and the bootstrapped standard errors that are robust. The robust errors have a higher significance values, but none are increased to a point where they are no longer significant towards the model. The observed standard errors from the robust errors are all noticeably lower than the standard errors from the original model. This is a bonus to the model, as it indicates that these robust standard errors make the model more accurate.</p>
+</div>
+<div id="logistic-regression-model-with-two-variables" class="section level2">
+<h2>Logistic Regression Model with two variables</h2>
+<pre class="r"><code>logfit &lt;- glm(headache ~ medication + time, data = migraine, 
+    family = &quot;binomial&quot;)
+coeftest(logfit)</code></pre>
+<pre><code>## 
+## z test of coefficients:
+## 
+##                        Estimate Std. Error z value  Pr(&gt;|z|)    
+## (Intercept)          -0.1456010  0.0778190 -1.8710  0.061342 .  
+## medicationreduced     1.5100027  0.1057633 14.2772 &lt; 2.2e-16 ***
+## medicationcontinuing  0.8416751  0.0846877  9.9386 &lt; 2.2e-16 ***
+## time                 -0.0052268  0.0015956 -3.2757  0.001054 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>The intercept is -0.147, however, the significance value indicates that in this logistic regression model, it is not significant enough to be included into an interpretation. The medication:reduced has a slope of 1.51, indicating while all other variables are held constant, as medication:reduced increases by one, the likelihood of headache will increase by a factor of 1.51. The medication:continuing has a slope of 0.842, indicating that while all other variables are held constant, and as medication:continuing increases by one, the likelihood of a headache will increase by a factor of 0.842. The time coefficient shows that while all other variables are held constant, as time increases by one, the likelihood of headache being true decreases by a factor of 0.005.</p>
+<pre class="r"><code>library(plotROC)
+library(dplyr)
+probs &lt;- predict(logfit, type = &quot;response&quot;)
+table(predict = as.numeric(probs &gt; 0.5), truth = migraine$headache) %&gt;% 
+    addmargins</code></pre>
+<pre><code>##        truth
+## predict   no  yes  Sum
+##     0    440  343  783
+##     1   1046 2323 3369
+##     Sum 1486 2666 4152</code></pre>
+<p>From the confusion matrix, sensitivity, specificity, accuracy, and precision can be calculated. TPR, or sensitivity, from this model is 0.871 (2323/2666). TNR, or specificity, from this model is 0.296 (440/1486). Accuracy from this model is 0.665 ((2323+440)/4152). PPV, or precision, from this model is 0.690 (2323/3369).</p>
+<pre class="r"><code>ggplot(migraine, aes(x = time, fill = headache)) + geom_density(alpha = 0.4)</code></pre>
+<p><img src="/project/Project2_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ROCplot &lt;- ggplot(migraine) + geom_roc(aes(d = headache, m = time), 
+    n.cuts = 0)
+ROCplot</code></pre>
+<p><img src="/project/Project2_files/figure-html/unnamed-chunk-13-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>calc_auc(ROCplot)</code></pre>
+<pre><code>##   PANEL group       AUC
+## 1     1    -1 0.4713191</code></pre>
+<p>The results from the ROC and AUC plot indicate that the model created has very poor accuracy at predicting. The AUC value of 0.47 means that this model will only be able to accurately predict whether or not a person has a headache 47.1% of the time.</p>
+</div>
+<div id="logistic-regression-model-with-all-variables" class="section level2">
+<h2>Logistic Regression Model with ALL variables</h2>
+<pre class="r"><code>finalfit &lt;- glm(headache ~ (.), data = migraine, family = &quot;binomial&quot;)
+coeftest(finalfit)</code></pre>
+<pre><code>## 
+## z test of coefficients:
+## 
+##                         Estimate  Std. Error z value  Pr(&gt;|z|)    
+## (Intercept)           0.07260834  0.20383502  0.3562  0.721682    
+## id                   -0.01329045  0.00435415 -3.0524  0.002270 ** 
+## time                 -0.01001337  0.00171425 -5.8413 5.181e-09 ***
+## dos                   0.00140841  0.00049856  2.8249  0.004729 ** 
+## hatypeMixed           0.85805591  0.15156888  5.6612 1.504e-08 ***
+## hatypeNo Aura        -0.37160885  0.07614636 -4.8802 1.060e-06 ***
+## age                  -0.00906944  0.00314134 -2.8871  0.003888 ** 
+## airq                  0.00982468  0.00364320  2.6967  0.007003 ** 
+## medicationreduced     1.64606182  0.11115488 14.8087 &lt; 2.2e-16 ***
+## medicationcontinuing  0.90868701  0.08783088 10.3459 &lt; 2.2e-16 ***
+## sexmale               0.07304578  0.10254380  0.7123  0.476256    
+## dos_c                         NA          NA      NA        NA    
+## time_c                        NA          NA      NA        NA    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>probs &lt;- predict(finalfit, type = &quot;response&quot;)
+table(predict = as.numeric(probs &gt; 0.5), truth = migraine$headache) %&gt;% 
+    addmargins</code></pre>
+<pre><code>##        truth
+## predict   no  yes  Sum
+##     0    419  261  680
+##     1   1067 2405 3472
+##     Sum 1486 2666 4152</code></pre>
+<p>The accuracy of this model is 0.680 ((2405+419)/4152). TPR for this model is 0.902 (2405/2666). TNR for this model is 0.282 (419/1486). PPV for this model is 0.693 (2405/3472).</p>
+<pre class="r"><code>library(dplyr)
+k = 10
+
+# your code here
+folds &lt;- cut(seq(1:nrow(migraine)), breaks = k, labels = F)  #create folds
+poke1 &lt;- subset(migraine)
+
+diags &lt;- NULL
+for (i in 1:k) {
+    # FOR EACH OF 10 FOLDS
+    train &lt;- poke1[folds != i, ]  # CREATE TRAINING SET
+    test &lt;- poke1[folds == i, ]  # CREATE TESTING SET
+    
+    truth &lt;- migraine$headache[folds == i]
+    
+    fit &lt;- glm(headache ~ (.), data = migraine, family = &quot;binomial&quot;)
+    probs &lt;- predict(fit, newdata = test, type = &quot;response&quot;)
+    diags &lt;- rbind(diags, class_diag(probs, truth))  #CV DIAGNOSTICS FOR EACH FOLD
+}
+
+summarise_all(diags, mean)  #AVERAGE THE DIAGNOSTICS ACROSS THE 10 FOLDS</code></pre>
+<pre><code>##         acc      sens      spec       ppv       auc
+## 1 0.6801657 0.9016496 0.2761843 0.6959226 0.6750381</code></pre>
+<p>The accuracy of this model from a 10-fold CV is 0.68. The sensitivity of this model from a 10-fold CV is 0.902. The specificity of this model from a 10-fold CV is 0.276. The precision of this model from a 10-fold CV is 0.696. The AUC of this model from a 10-fold CV is 0.675. This is a significant improvement from the previous model, as this model poor at predicting whether or not an individual has a headache, but it is much better than the previous model’s capabilities at predicting.</p>
+<pre class="r"><code>library(glmnet)
+y &lt;- as.matrix(poke1$headache)  #grab response
+x &lt;- model.matrix(headache ~ (.), data = poke1)[, -1]  #grab predictors
+x &lt;- scale(x)
+
+cv &lt;- cv.glmnet(x, y, family = &quot;binomial&quot;)
+lasso &lt;- glmnet(x, y, family = &quot;binomial&quot;, lambda = cv$lambda.1se)
+coef(lasso)</code></pre>
+<pre><code>## 13 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                                s0
+## (Intercept)           0.609559596
+## id                    .          
+## time                 -0.080552677
+## dos                   .          
+## hatypeMixed           0.138960469
+## hatypeNo Aura        -0.139901382
+## age                  -0.047527516
+## airq                  .          
+## medicationreduced     0.474423644
+## medicationcontinuing  0.270141292
+## sexmale               .          
+## dos_c                 .          
+## time_c               -0.001429322</code></pre>
+<p>From the LASSO function call, the variables that should be retained are time, hatype, age, airq, and medication.</p>
+<pre class="r"><code>library(dplyr)
+k = 10
+
+# your code here
+folds &lt;- cut(seq(1:nrow(migraine)), breaks = k, labels = F)  #create folds
+keeps &lt;- c(&quot;time&quot;, &quot;hatype&quot;, &quot;age&quot;, &quot;medication&quot;, &quot;headache&quot;)
+poke1 &lt;- migraine[keeps]
+
+diags &lt;- NULL
+for (i in 1:k) {
+    # FOR EACH OF 10 FOLDS
+    train &lt;- poke1[folds != i, ]  # CREATE TRAINING SET
+    test &lt;- poke1[folds == i, ]  # CREATE TESTING SET
+    
+    truth &lt;- migraine$headache[folds == i]
+    
+    fit &lt;- glm(headache ~ time + hatype + age + medication, data = migraine, 
+        family = &quot;binomial&quot;)
+    probs &lt;- predict(fit, newdata = test, type = &quot;response&quot;)
+    diags &lt;- rbind(diags, class_diag(probs, truth))  #CV DIAGNOSTICS FOR EACH FOLD
+}
+
+summarise_all(diags, mean)  #AVERAGE THE DIAGNOSTICS ACROSS THE 10 FOLDS</code></pre>
+<pre><code>##         acc      sens      spec       ppv       auc
+## 1 0.6820905 0.9120577 0.2628274 0.6947018 0.6717642</code></pre>
+<p>While hypothetically the AUC is to go up after removing all the variables that do not assist in predicting, the contrary was the case for this specific data set. Instead, AUC for this model declined, indicating that its ability to predict is less capable than the previous model. In conclusion, a model with all the variables included will most accurately predict whether or not somebody will have a headache after the progression of treatment process.</p>
+</div>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/js/docs.min.js"></script>
+<script src="/js/main.js"></script>
+
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

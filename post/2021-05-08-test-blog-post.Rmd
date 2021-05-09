@@ -1,0 +1,48 @@
+---
+title: Test blog post!
+author: ''
+date: '2021-05-08'
+slug: test-blog-post
+categories: []
+tags: []
+description: ''
+---
+
+```{r}
+library(reticulate)
+py_config()
+```
+
+Hello world! This is a test blog post that is a sample of what I can do with RStudio and making websites.
+
+[Link to project 1](/project/project1/)
+
+[Link to google](https://www.google.com)
+
+![](https://img-cdn.hltv.org/playerbodyshot/z0xReVzWHD-El6SehigdXP.png?bg=3e4c54&h=800&ixlib=java-2.1.0&rect=140%2C8%2C439%2C439&w=800&s=33cbc2f26251016ddbd7a248555971ee)
+
+```{r}
+library()
+mean(airquality$Temp)
+```
+
+## This is some random text!
+
+Whoops. Hehe. Have a great day!
+
+```{python}
+two = 2
+three = 3
+two + three
+
+x=list(range(2,8,2)) #sequence from 2 up to (not including) 8, by 2
+len(x)
+
+import numpy as np 
+x=np.array([1,2,3])
+x
+
+mat1=np.array([[1,2],[3,4]])
+np.arange(1,5).reshape(2,2)
+mat1
+```

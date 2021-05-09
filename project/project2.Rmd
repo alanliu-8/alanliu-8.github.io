@@ -1,0 +1,267 @@
+---
+title: "Project2"
+author: "Alan Liu"
+date: "5/6/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", 
+    warning = F, message = F, tidy = TRUE, tidy.opts = list(width.cutoff = 60), 
+    R.options = list(max.print = 100))
+
+class_diag <- function(probs,truth){ 
+  #CONFUSION MATRIX: CALCULATE ACCURACY, TPR, TNR, PPV 
+  if(is.character(truth)==TRUE) truth<-as.factor(truth) 
+  if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1 
+  tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),factor(truth, levels=c(0,1))) 
+  acc=sum(diag(tab))/sum(tab) 
+  sens=tab[2,2]/colSums(tab)[2] 
+  spec=tab[1,1]/colSums(tab)[1] 
+  ppv=tab[2,2]/rowSums(tab)[2] 
+  
+#CALCULATE EXACT AUC 
+  ord<-order(probs, decreasing=TRUE) 
+  probs <- probs[ord]; truth <- truth[ord] 
+  TPR=cumsum(truth)/max(1,sum(truth))  
+  FPR=cumsum(!truth)/max(1,sum(!truth)) 
+  dup <-c(probs[-1]>=probs[-length(probs)], FALSE) 
+  TPR <-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1) 
+  n <- length(TPR) 
+  auc <- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n])) 
+  data.frame(acc,sens,spec,ppv,auc) 
+}
+```
+
+## Project 2: Modeling, Testing, and Predicting
+
+## Introduction
+
+The data set being analyzed in this project is the KosteckiDillon data set from the carData package. The data set consists of logs from 133 patients from a treatment program that aimed to reduce migraine frequency and severity. This data set contains the variables time, dos, hatype, age, airq, medication, headache, and sex. Time represents the time in days relative to the onset of treatment, which occurred at time zero. Dos represents the time in days from the start of the study (January 1). Hatype represents the type of migraine experienced by the subject. Age represents the age of the subject at the onset of the treatment in years. Airq represents the air quality the subject experiences. Medication represents subjects who discontinued their medication, continued with a reduced dose, or continued at the previous dose. Headache represents the subject's answer if they experienced a headache or not (yes or no). Sex represents the sex of the subject (male or female). This data set has a total of 4152 observations.
+
+```{r}
+library(carData)
+migraine <- data.frame(KosteckiDillon)
+head(migraine)
+```
+
+## MANOVA Test
+
+```{r}
+man1 <- manova(cbind(time, dos, age, airq, headache, sex)~medication, data=migraine)
+summary(man1)
+```
+
+Because the MANOVA summary indicates that the MANOVA test is significant, one-way ANOVA tests are needed to be done for each individual variable.
+
+```{r}
+summary.aov(man1)
+```
+
+After looking at each individual variable, it can be concluded that all of these variables are significant. However, because headache and sex are categorical variables, they will be excluded in the t-test analysis. With the significant variables selected, a POST HOC T-test is to be conducted on these variables.
+
+```{r}
+library(dplyr)
+library(rstatix)
+group <- migraine$medication
+DVs <- migraine %>%
+  select(time, age, dos, airq)
+#test for normality
+sapply(split(DVs, group), mshapiro_test)
+#test for homogeneity
+lapply(split(DVs,group), cov)
+
+migraine %>%
+  group_by(medication) %>%
+  summarize(mean(time),mean(age),mean(dos),mean(airq))
+
+pairwise.t.test(migraine$time, migraine$medication, p.adj="none")
+pairwise.t.test(migraine$age, migraine$medication, p.adj="none")
+pairwise.t.test(migraine$dos, migraine$medication, p.adj="none")
+pairwise.t.test(migraine$airq, migraine$medication, p.adj="none")
+```
+
+The one-way MANOVA was conducted to determine the effect of the medication from four dependent variables (time, age, dos and airq). After checking the data, each group revealed no significant differences from multivariate normality. The covariance matrix for each group revealed there was a lack of relative homogeneity. No univariate or multivariate outliers were evident and MANOVA was considered to be an appropriate analysis technique.
+
+Significant differences were found among the three different results of medication after the treatment program was over.
+
+Univariate ANOVAs for each numerical variable was conducted as a follow up tests to the MANOVA. The univariate ANOVAs for the dependent variables were also significant. Because the post hoc was tested with adjustments, a type 1 error is not needed to be calculated.
+
+The total number of tests performed was 17 (1 MANVOA, 4 ANOVAs, 12 t tests)The Post Hoc analysis was performed conducting pairwise comparisons to determine which medication differed in all the dependent variables (time, age dos, and air quality). Using the bonferroni significance correction (17 tests done, new alpha level should be = 0.294), all medications were found to differ significantly from one another even with the bonferroni alpha level.
+
+## Randomized Test
+
+In this randomized test, we are testing the difference in standard deviations between two groups in terms of air quality. The null hypothesis for this test is the average standard deviation difference of air quality between the two groups (males and females) is the same. The alternative hypothesis is that the standard deviation difference is different between males and females.
+
+```{r}
+library(dplyr)
+migraine %>%
+  group_by(sex) %>%
+  summarize(s=sd(airq)) %>%
+  summarize(diff(s))
+
+rand_dist<-vector()
+for(i in 1:300) {
+  new <- data.frame(airq=sample(migraine$airq), sex=migraine$sex)
+  rand_dist[i]<-sd(new[new$sex=="male",]$airq)-sd(new[new$sex=="female",]$airq)
+}
+
+mean(rand_dist< -0.282 | rand_dist>0.282)
+
+hist(rand_dist,main="",ylab=""); abline(v = c(0.282,-0.282),col="red")
+```
+
+From the results, we reject the null hypothesis. There is enough evidence to conclude that the average standard deviation of air quality between the two groups, males and females, is significantly different enough. The p-value generated from the random sample indicates that there exists enough of a difference to a point where the null hypothesis can no longer be correct.
+
+## Building a Linear Regression Model
+
+```{r}
+migraine$dos_c <- migraine$dos - mean(migraine$dos)
+migraine$time_c <- migraine$time - mean(migraine$time)
+
+fit <- lm(airq~dos_c+medication+(dos_c*medication), data=migraine)
+summary(fit)
+```
+
+The model created to predict the air quality of a subject from their time in days from the start of the study and their type of medication they are on after the treatment was over. The intercept is 26.274, which means that a subject with zero start time and zero medication will have a starting air quality of 26.274. Reduced medication subjects with zero dos have a predicted air quality that is -1.529 lower than non-reduced medication subjects with zero dos. Continuing medication subjects with zero dos have a predicted dos that is -1.791 lower than non-continuing medicated subjects with zero dos. For every 1-unit increase in dos, air quality will decrease by a factor of 0.0134. The slope of dos for subjects who have reduced medication is 0.0102 greater than  subjects who have continuing medication. The slope of dos for subjects who have continuing medication is 0.0123 greater than subjects who have reduced medication.
+
+```{r}
+library(ggplot2)
+ggplot(fit, aes(airq, dos_c, color=medication)) + geom_smooth(method = "lm", se = F, fullrange = T) + geom_point() + geom_vline(xintercept=0,lty=2)+geom_vline(xintercept=mean(migraine$airq))
+```
+
+From the R square value, the model indicates that 4.61% of variability in air quality is explained.
+
+```{r}
+library(ggplot2)
+#assumptions check
+resids <- fit$residuals
+ggplot() + geom_histogram(aes(resids), bins=20)
+ggplot(fit, aes(sample=resids)) + stat_qq() + stat_qq_line()
+fitvals <- fit$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, color='red')
+```
+
+From the visual assumptions checks it can be safely assumed that the model fails the linearity/homoeskedasticity assumption. The residual plot indicates that the points plotted are statistically influenced by one another, as the points lie on top of one another. The model does pass the normality check, as the points plotted by the normality plot fall relatively on the line.
+
+```{r}
+# correction for robust standard errors
+library(sandwich)
+library(lmtest)
+bptest(fit)
+coeftest(fit, vcov = vcovHC(fit))[,1:4]
+```
+
+From the robust standard errors, these correct the original standard errors from the original model and correct the violations of homoskedasticity discovered from the assumptions checks. These corrected standard errors are all significant (indicated by the p-values from the table), and will be bootstrapped to the model and used as the default standard errors.
+
+## Bootstrapping Standard Errors
+
+```{r}
+coeftest(fit)[,1:4]
+coeftest(fit, vcov=vcovHC(fit))[,1:4]
+```
+
+There are noticeable changes in the standard errors after analyzing the difference between the original standard errors and the bootstrapped standard errors that are robust. The robust errors have a higher significance values, but none are increased to a point where they are no longer significant towards the model. The observed standard errors from the robust errors are all noticeably lower than the standard errors from the original model. This is a bonus to the model, as it indicates that these robust standard errors make the model more accurate.
+
+## Logistic Regression Model with two variables
+
+```{r}
+logfit <- glm(headache~medication+time, data=migraine, family = "binomial")
+coeftest(logfit)
+```
+
+The intercept is -0.147, however, the significance value indicates that in this logistic regression model, it is not significant enough to be included into an interpretation. The medication:reduced has a slope of 1.51, indicating while all other variables are held constant, as medication:reduced increases by one, the likelihood of headache will increase by a factor of 1.51. The medication:continuing has a slope of 0.842, indicating that while all other variables are held constant, and as medication:continuing increases by one, the likelihood of a headache will increase by a factor of 0.842. The time coefficient shows that while all other variables are held constant, as time increases by one, the likelihood of headache being true decreases by a factor of 0.005.
+
+```{r}
+library(plotROC)
+library(dplyr)
+probs <- predict(logfit, type="response")
+table(predict=as.numeric(probs>.5),truth=migraine$headache)%>%addmargins
+```
+
+From the confusion matrix, sensitivity, specificity, accuracy, and precision can be calculated. TPR, or sensitivity, from this model is 0.871 (2323/2666). TNR, or specificity, from this model is 0.296 (440/1486). Accuracy from this model is 0.665 ((2323+440)/4152). PPV, or precision, from this model is 0.690 (2323/3369).
+
+```{r}
+ggplot(migraine, aes(x=time, fill=headache)) + geom_density(alpha=0.4)
+ROCplot<-ggplot(migraine)+geom_roc(aes(d=headache,m=time), n.cuts=0) 
+ROCplot
+
+calc_auc(ROCplot)
+```
+
+The results from the ROC and AUC plot indicate that the model created has very poor accuracy at predicting. The AUC value of 0.47 means that this model will only be able to accurately predict whether or not a person has a headache 47.1% of the time.
+
+## Logistic Regression Model with ALL variables
+
+```{r}
+finalfit <- glm(headache~(.), data=migraine, family = "binomial")
+coeftest(finalfit)
+probs <- predict(finalfit, type = "response")
+table(predict = as.numeric(probs > 0.5), truth = migraine$headache) %>% addmargins
+```
+
+The accuracy of this model is 0.680 ((2405+419)/4152). TPR for this model is 0.902 (2405/2666). TNR for this model is 0.282 (419/1486). PPV for this model is 0.693 (2405/3472).
+
+```{r}
+library(dplyr)
+k=10
+
+# your code here
+folds<-cut(seq(1:nrow(migraine)),breaks=k,labels=F) #create folds
+poke1 <- subset(migraine)
+
+diags <- NULL
+for(i in 1:k){          # FOR EACH OF 10 FOLDS
+  train<-poke1[folds!=i,] # CREATE TRAINING SET
+  test<-poke1[folds==i,]  # CREATE TESTING SET
+  
+  truth<-migraine$headache[folds==i]
+  
+  fit<- glm(headache~(.), data=migraine, family="binomial")
+  probs<- predict(fit, newdata=test,type="response")
+  diags<-rbind(diags,class_diag(probs,truth)) #CV DIAGNOSTICS FOR EACH FOLD
+}
+
+summarise_all(diags,mean) #AVERAGE THE DIAGNOSTICS ACROSS THE 10 FOLDS
+```
+
+The accuracy of this model from a 10-fold CV is 0.68. The sensitivity of this model from a 10-fold CV is 0.902. The specificity of this model from a 10-fold CV is 0.276. The precision of this model from a 10-fold CV is 0.696. The AUC of this model from a 10-fold CV is 0.675. This is a significant improvement from the previous model, as this model poor at predicting whether or not an individual has a headache, but it is much better than the previous model's capabilities at predicting.
+
+```{r}
+library(glmnet)
+y<-as.matrix(poke1$headache) #grab response
+x<-model.matrix(headache~(.),data=poke1)[,-1] #grab predictors
+x<-scale(x)
+
+cv<-cv.glmnet(x,y,family="binomial")
+lasso<-glmnet(x,y,family="binomial",lambda=cv$lambda.1se)
+coef(lasso)
+```
+
+From the LASSO function call, the variables that should be retained are time, hatype, age, airq, and medication.
+
+```{r}
+library(dplyr)
+k=10
+
+# your code here
+folds<-cut(seq(1:nrow(migraine)),breaks=k,labels=F) #create folds
+keeps <- c("time", "hatype", "age", "medication", "headache")
+poke1 <- migraine[keeps]
+
+diags <- NULL
+for(i in 1:k){          # FOR EACH OF 10 FOLDS
+  train<-poke1[folds!=i,] # CREATE TRAINING SET
+  test<-poke1[folds==i,]  # CREATE TESTING SET
+  
+  truth<-migraine$headache[folds==i]
+  
+  fit<- glm(headache~time+hatype+age+medication, data=migraine, family="binomial")
+  probs<- predict(fit, newdata=test,type="response")
+  diags<-rbind(diags,class_diag(probs,truth)) #CV DIAGNOSTICS FOR EACH FOLD
+}
+
+summarise_all(diags,mean) #AVERAGE THE DIAGNOSTICS ACROSS THE 10 FOLDS
+```
+
+While hypothetically the AUC is to go up after removing all the variables that do not assist in predicting, the contrary was the case for this specific data set. Instead, AUC for this model declined, indicating that its ability to predict is less capable than the previous model. In conclusion, a model with all the variables included will most accurately predict whether or not somebody will have a headache after the progression of treatment process.

@@ -1,0 +1,243 @@
+---
+title: "Project 1"
+author: "Alan Liu"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", 
+    warning = F, message = F, tidy = TRUE, tidy.opts = list(width.cutoff = 60), 
+    R.options = list(max.print = 100))
+```
+
+#### This project requires data from two separate data sets. Information about these the first dataset for Wages, Experience, and Schooling can be found here: https://vincentarelbundock.github.io/Rdatasets/doc/Ecdat/Wages1.html
+
+#### Information about the second dataset for Salies for Professors can be found here: https://vincentarelbundock.github.io/Rdatasets/doc/carData/Salaries.html
+
+#### To download the csv files directly, please click these links:
+##### https://vincentarelbundock.github.io/Rdatasets/csv/Ecdat/Wages1.csv
+##### https://vincentarelbundock.github.io/Rdatasets/csv/carData/Salaries.csv
+
+## Introduction
+
+The two data sets being analyzed in this project (links to the data sets official pages can be found above) are the Wages, Experience and Schooling data set and the Salaries for Professors data set. The Wages, Experience and Schooling data set was chosen because of interest in how experience, schooling, sex all contribute to the wage of an individual. The point of this data set is to analyze the diversity or discrimination that occurs in the workforce because of the variables included in the data set (experience, sex, schooling, and wage). The second data set was chosen because of the interest in how wages/salaries in the profession of professors is affected based on sex, discipline, and service. Both of these data sets are expected to have potential gender association, as there has been a proven disproportionate gender pay gap, so men are expected to make more than women and women less than men. Additionally, there is an expected association between the wage/salary of an individual and how long they have had schooling or have been experienced in a certain field. While other potential association may exist/may be found at the conclusion of the project, there are not apparent at the surface level of the data sets.
+
+```{r}
+# if "dplyr" is not installed, run the following code in the console:
+# install.packages("dplyr")
+library(Ecdat)
+library(carData)
+library(dplyr)
+library(tidyverse)
+wages <- data.frame(Wages1)
+profwages <- data.frame(Salaries)
+glimpse(wages)
+glimpse(profwages)
+```
+
+## Initial Wrangling & Tidying
+
+```{r tidy}
+# Adjusting the 1980's wages variable to be a 2009 yearly salary variable
+wages <- wages %>%
+  mutate(salary = (round((wage * 40) * 39.1072) * 2.74))
+head(wages)
+
+# Renaming "professors service" to "years of experience"
+profwages <-profwages %>%
+  rename(exper = yrs.service)
+
+# Cleaning the data so that "Males" become "males" and "Females" become "females"
+profwages <- profwages %>%
+  mutate(sex = if(sex=="Male") {
+    sex="male"
+  }
+  else {
+    sex="female"
+  })
+```
+
+All data in both data sets was already mostly tidy. The only tidying needed to be done was toLower() the name of the sexes. Because one data set had sexes starting with a capital and one data set had the sexes starting with a lower case, the capital-starting sexes variable was changed to become lower case. Renaming the variable "yrs.service" in the Salaries data set to "exper" was also done because the experience variable in the Wages1 data set represents the same idea. These two variables were combined and are going to be used in the full_join() function.Additional tidying will be done in the summarizing section. Because salaries were represented differently in the two data sets, an initial wrangling call (mutate()) had to be done in order to join the two data sets together by a specific variable. The "Wages1" data set represented salaries paid by the hour, so this data set was mutated so that the represented variable "salary" would align closer to the other data set, "Salaries", and the variable located in that data set called "salary". In addition to the mutation of this column, it was also adjusted for inflation. The prices represented in the "wages1" data set were 1980's prices whereas the "Salaries" data set was represented by 2009 prices. This has been adjusted accordingly so that the data being analyzed will be more accurately documented and recorded.
+
+## Joining/Merging
+
+```{r}
+allwages <- full_join(wages, profwages, by=c("salary", "sex", "exper"))
+summary(allwages)
+```
+
+A full-join by salary, sex, and experience was used to join the two data sets. This is because the variables that were common in both of the data sets were sex, salary, and experience, three variables that can be merged into the single large data set. The other variables, (school, wage, rank, discipline, yrs.since.phd, yrs.service), are all necessary for later the final data set. Because there are some data observations with NAs from one data set and other NAs from the other data set, none of the cases in this data set were dropped. All of them were preserved for the total, final data set.
+
+## Wrangling
+```{r}
+# if kable graphs are not installed, run this in the console: install.packages("kableExtra")
+library(kableExtra)
+# creating a range bracket variable as part of the wrangling
+allwages %>%
+  group_by(salary_range=cut(salary, breaks=seq(0, 250000, by=10000))) %>%
+  summarize(count=n()) -> salary_range
+glimpse(salary_range)
+
+# create a categorical subset that only includes males
+allwages %>%
+  select(salary, sex) %>%
+  filter(sex=="male") %>%
+  arrange(desc(salary)) -> male_data
+
+# create a categorical subset that only includes females
+allwages %>%
+  select(salary, sex) %>%
+  filter(sex=="female") %>%
+  arrange(desc(salary)) -> female_data
+
+# summarizing overall data
+all_sum <- data.frame(
+  Statistics = c("Mean", "Standard Deviation", "Variance", "Minimum", "Maximum"),
+  Values = c(
+  mean(allwages$salary),
+  sd(allwages$salary),
+  var(allwages$salary),
+  min(allwages$salary),
+  max(allwages$salary)
+  )
+)
+options(scipen = 999)
+kbl(all_sum) %>%
+  kable_paper(full_width = F) %>%
+  column_spec(1, bold = T, border_right = T) %>%
+  column_spec(2, width = "10em", background = "lightgrey")
+
+allwages %>%
+  summarize(mean(salary), sd(salary), var(salary), var(salary), min(salary), max(salary)) %>%
+  kbl() %>%
+  kable_paper(full_width = F) %>%
+  column_spec(1, width="10em", border_right=T, background="yellow") %>%
+  column_spec(2, width="10em", border_right=T, background="yellow") %>%
+  column_spec(3, width="10em", border_right=T, background="yellow") %>%
+  column_spec(4, width="10em", border_right=T, background="yellow") %>%
+  column_spec(5, width="10em", background="yellow")
+
+# summarizing after male categorical grouping
+male_data %>%
+  summarize(mean(salary), sd(salary), var(salary), min(salary), max(salary)) %>%
+  pivot_longer(cols=everything(), names_to="Statistic", values_to="Values") %>%
+  kbl() %>%
+  kable_paper(full_width = F) %>%
+  column_spec(1, bold = T, border_right = T) %>%
+  column_spec(2, width = "10em", background = "lightblue")
+
+# summarizing after female categorical grouping
+female_data %>%
+  summarize(mean(salary), sd(salary), var(salary), min(salary), max(salary)) %>%
+  pivot_longer(cols=everything(), names_to="Statistic", values_to="Values") %>%
+  kbl() %>%
+  kable_paper(full_width = F) %>%
+  column_spec(1, bold = T, border_right = T) %>%
+  column_spec(2, width = "10em", background = "pink")
+
+# If looking for categorical mutations earlier in this block of code. If looking for mutation and/or use of if statements, check section "Initial Wrangling & Tidying".
+```
+
+Initially, the procedure to get to the summary statistics is to create multiple subsets using group_by and filtering to make later groupings easier. Next, conducting the summary statistics by using summary() and the applicable function calls (mean(), sd(), etc.) shows a crude representation of what occurs after the function calls. Afterwards, pivot_longer and kbl() function calls are done to make the data much more easily readable and understandable. From the summary statistics, what is easily observable is the significant difference in the categorical division of the large data set. The difference in salaries between males and females is extremely obvious, as the mean difference between the two genders is nearly DOUBLE as much for males than it is for females. Additionally, the maximum salary observed in this data set for males is paid nearly $100,000 more than the highest paid female from this data set. While this data analysis is shocking, it is unsurprising. The gender inequality difference is disgustingly apparent, even more so because of this data set and the time frame this data was collected (1980 for the first data set, 2009 for the second data set, as gender inequalities were not looked down upon as harshly).
+
+
+## Visualizing
+
+```{r}
+# creation of the correlation heatmap
+library("ggplot2")
+allwages %>%
+  select_if(is.numeric) %>%
+  cor(use="pairwise.complete.obs") %>%
+  as.data.frame %>%
+  rownames_to_column("var1") %>%
+  pivot_longer(-1, names_to="var2", values_to="correlation") %>%
+  ggplot2::ggplot(aes(var1, var2, fill=correlation))+geom_tile()+geom_text(aes(label=round(correlation,2)))
+```
+
+The correlation matrix is complete with some "omitted"/"NA" cells because of the difference between the two data sets variables. While one data set has a variable that discusses "years since phd", the other data set does not have this variable, but instead uses variables like "wage" and "experience". This lone variable is important. It shows the correlation between years since an individual's Ph.D and their experience or their salary. While this is not applicable to some individuals who has not received a Ph.D (aka, the individuals who are in the Wages1 data set), it is still important to see/analyze/understand that there is a relationship/correlation between these three variables in this data set and the final data set. Therefore, this variable was not removed from this visualization of total correlations. However, it will be removed later in a later section in order to run certain functions.
+
+```{r}
+# Visualizing data from Salaries data set
+phd_discipl_rank <-  Salaries %>% ggplot2::ggplot() + 
+  geom_point(aes(x = yrs.since.phd, y = salary, color = rank)) +
+  labs(x = "Years since Ph.D.", y = "Nine-Month Salary (in Dollars)",
+  title = "Nine-Month Salary vs. Years since Ph.D.") +
+  scale_x_continuous(breaks=(seq(0, max(Salaries$yrs.since.phd), by=5))) +
+  scale_y_continuous(breaks=(seq(50000, max(Salaries$salary), by=10000))) +
+  theme(panel.grid.major = element_line(colour="yellow")) +
+  theme(panel.background = element_rect("lightgrey"))
+
+phd_discipl_rank
+
+# Visualizing data from Wages1 data set
+sex_school_wage <-  Wages1 %>% ggplot2::ggplot() + 
+  geom_point(aes(x = school, y = wage, color = sex), stat="summary") +
+  labs(x = "Total Years of Schooling", y = "Hourly Wage (in Dollars)",
+  title = "Hourly Wage vs. Years of Schooling") +
+  scale_x_continuous(breaks=(seq(0, max(Wages1$school)))) +
+  theme(panel.grid.major = element_line(colour="grey"))
+
+sex_school_wage
+```
+
+From the Nine-Month Salary vs. Years since Ph.D, it is quite apparent that under the rank of Professor, those individuals will make much more than the Assistant Professors or the Associate Professors. Additionally, because ranked Professors have spent much more time in a college scene, their years since they got their Ph.D is much more than an individual ranked as a Assistant Professor or a Associate Professor. Overall, the trend is that the more years it has been since an individual has received their Ph.D, it is more likely that they are going to be a full-time Professor. As an individual's salary increases, it is more likely that they are a full-time Professor.
+
+From the Hourly Wage vs. Years of Schooling graph, the summary statistics show that as an individual increases their total years of schooling, the direct correlation is that their hourly wage in dollars will increase over time. However, at the very end of the graph, it appears that after a total year of schooling great than 16, individuals will begin to decrease their hourly wage and not make as much as an individual who has only 15 years of schooling. It is also quite apparent that females will always make significantly less than their male counter-parts, despite their total years of schooling being identical. This continues to prove the fact that a gender-pay discrepancy exists in the United States.
+
+## Dimensionality Reduction
+
+```{r}
+# cleaning the data set one more time for final dimensionality reduction
+cleanwages <- allwages[, colSums(is.na(allwages)) == 0]
+
+# Changing the variable "sex" to represent males as 1 and females as 0
+cleanwages <- cleanwages %>%
+  mutate(sex = if(sex=="Male") {
+    sex=1
+  }
+  else {
+    sex=0
+  })
+
+wss <- vector()
+
+# algorithm to find ideal number of clusters
+for(i in 1:10){
+  temp<- cleanwages %>% select(everything()) %>% 
+    kmeans(i)
+  wss[i]<-temp$tot.withinss
+  }
+
+ggplot()+geom_point(aes(x=1:10,y=wss))+geom_path(aes(x=1:10,y=wss))+  xlab("clusters")+scale_x_continuous(breaks=1:10)
+```
+
+According to the graph, the optimal amount of clusters should be 4.
+
+```{r}
+# creating the final visualizations for the clusters
+kmeans1 <- cleanwages %>% kmeans(4)
+cluster <- kmeans1$cluster
+kmeans1
+
+# Final tidying of the data
+ggplot(cleanwages, aes(x=exper,y=salary, color=cluster))+geom_point()+
+  guides(color=guide_legend(override.aes=list(size=10))) +
+  theme(legend.key=element_rect())
+
+# install.packages("factoextra") & install.packages("cluster") need to be run in console before running this code
+library(factoextra)
+library(cluster)
+
+sil <- silhouette(cluster, dist(cleanwages))
+fviz_silhouette(sil)
+```
+
+In using an algorithm to determine the correct number of clusters to represent my data should be around 4 clusters. After finding the optimal amount of clusters, generating a visualization of the clusters was done after the entire data set was cleaned, removing all column variables that contained NA's. After the visualization was generated, clusters were color coordinated to have a better understanding of what the cluster points better represented. According to the visualization of the clusters, if an individual has less than 20 years of experience in whatever their field of interest is, the range of salaries has extreme variance. The lowest an individual makes is nearly $0 a year while the highest is over $200,000 a year. Anything after 20 years of experience, the clusters seem to steady out, as the lowest salary that an individual will make is near $60,000 while the highest an individual will make is over $250,000. This means that while most people will end up having little experience initially and not be paid very much, over time, as an individual gathers more experience in their field, they will very likely end up with a much higher salary than when they started.
+
+Additionally, from a silhouette analysis, the average silhouette width is 0.58. This indicates that a reasonable structure has been created with the clusters and that this data can be used to make reasonable assumptions from.

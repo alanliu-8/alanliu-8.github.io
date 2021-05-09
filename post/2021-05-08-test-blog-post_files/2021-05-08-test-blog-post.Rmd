@@ -1,0 +1,32 @@
+---
+title: Test blog post!
+author: ''
+date: '2021-05-08'
+slug: test-blog-post
+categories: []
+tags: []
+description: ''
+---
+
+```{r}
+library(reticulate)
+py_config()
+```
+
+Hello world! This is a test blog post that is a sample of what I can do with RStudio and making websites.
+
+[Link to project 1](/project/project1/)
+
+[Link to google](https://www.google.com)
+
+![](/post/2021-05-08-test-blog-post_files/stew.png)
+
+```{r}
+library()
+mean(airquality$Temp)
+```
+
+## This is some random text!
+
+Whoops. Hehe. Have a great day!
+
